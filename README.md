@@ -1,5 +1,6 @@
 # torch2pprof
 
+![torch2pprof](https://raw.github.com/olka/torch2pprof/master/data/torch2pprof.png)
 A tool to convert PyTorch profiler traces to the pprof format for visualization with `go tool pprof`.
 
 ## Overview

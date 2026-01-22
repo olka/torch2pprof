@@ -21,13 +21,12 @@ torch2pprof/
 │   └── pprof_verification.py     # Python script to verify pprof output
 │
 ├── data/                         # Sample data
-│   └── profff.json               # Example PyTorch trace
+│   └── trace.json.gz             # Example PyTorch trace
 │
 ├── go.mod                        # Go module definition
 ├── go.sum                        # Dependency checksums
 ├── Makefile                      # Build automation
 ├── README.md                     # User documentation
-└── PROJECT_LAYOUT.md             # This file
 ```
 
 ## Principles

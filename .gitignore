@@ -29,6 +29,7 @@ coverage.html
 # Temporary files
 *.tmp
 *.log
+.claude
 CHECKLIST.md
 CI_CD_SUMMARY.md
 CLAUDE_NOTES.md

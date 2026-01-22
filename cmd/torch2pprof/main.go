@@ -64,7 +64,10 @@ func convertCommand(args []string) {
 		fmt.Fprintf(os.Stderr, "\nConvert PyTorch profiler trace to pprof format\n")
 	}
 
-	fs.Parse(args)
+	if err := fs.Parse(args); err != nil {
+		fmt.Fprintf(os.Stderr, "Error parsing arguments: %v\n", err)
+		os.Exit(1)
+	}
 
 	if fs.NArg() != 2 {
 		fs.Usage()
@@ -109,15 +112,20 @@ func convertCommand(args []string) {
 		fmt.Printf("Error creating output file: %v\n", err)
 		os.Exit(1)
 	}
-	defer f.Close()
 
 	gz := gzip.NewWriter(f)
-	if _, err := gz.Write(profileBytes); err != nil {
-		fmt.Printf("Error writing profile: %v\n", err)
+	if _, writeErr := gz.Write(profileBytes); writeErr != nil {
+		_ = f.Close()
+		fmt.Printf("Error writing profile: %v\n", writeErr)
 		os.Exit(1)
 	}
-	if err := gz.Close(); err != nil {
-		fmt.Printf("Error closing gzip: %v\n", err)
+	if closeErr := gz.Close(); closeErr != nil {
+		_ = f.Close()
+		fmt.Printf("Error closing gzip: %v\n", closeErr)
+		os.Exit(1)
+	}
+	if closeErr := f.Close(); closeErr != nil {
+		fmt.Printf("Error closing file: %v\n", closeErr)
 		os.Exit(1)
 	}
 
@@ -138,7 +146,10 @@ func analyzeCommand(args []string) {
 		fs.PrintDefaults()
 	}
 
-	fs.Parse(args)
+	if err := fs.Parse(args); err != nil {
+		fmt.Fprintf(os.Stderr, "Error parsing arguments: %v\n", err)
+		os.Exit(1)
+	}
 
 	if fs.NArg() != 1 {
 		fs.Usage()

@@ -52,7 +52,7 @@ func LoadTraceFile(path string) (*TraceData, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	var reader io.Reader = file
 
@@ -64,12 +64,14 @@ func LoadTraceFile(path string) (*TraceData, error) {
 	} else {
 		// Check magic number (gzip files start with 0x1f 0x8b)
 		header := make([]byte, 2)
-		n, err := file.Read(header)
-		if err == nil && n == 2 && header[0] == 0x1f && header[1] == 0x8b {
+		n, readErr := file.Read(header)
+		if readErr == nil && n == 2 && header[0] == 0x1f && header[1] == 0x8b {
 			isGzip = true
 		}
 		// Reset file position
-		file.Seek(0, 0)
+		if _, seekErr := file.Seek(0, 0); seekErr != nil {
+			return nil, seekErr
+		}
 	}
 
 	// Wrap with gzip reader if compressed
@@ -78,7 +80,7 @@ func LoadTraceFile(path string) (*TraceData, error) {
 		if err != nil {
 			return nil, err
 		}
-		defer gzReader.Close()
+		defer func() { _ = gzReader.Close() }()
 		reader = gzReader
 	}
 

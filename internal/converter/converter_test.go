@@ -94,13 +94,15 @@ func TestLoadTraceFile_GzipJSON(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create file: %v", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	gz := gzip.NewWriter(f)
 	if _, err := gz.Write(data); err != nil {
 		t.Fatalf("Failed to write gzip data: %v", err)
 	}
-	gz.Close()
+	if err := gz.Close(); err != nil {
+		t.Fatalf("Failed to close gzip writer: %v", err)
+	}
 
 	// Test loading
 	loaded, err := LoadTraceFile(testFile)
@@ -139,13 +141,15 @@ func TestLoadTraceFile_GzipWithoutExtension(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create file: %v", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	gz := gzip.NewWriter(f)
 	if _, err := gz.Write(data); err != nil {
 		t.Fatalf("Failed to write gzip data: %v", err)
 	}
-	gz.Close()
+	if err := gz.Close(); err != nil {
+		t.Fatalf("Failed to close gzip writer: %v", err)
+	}
 
 	// Test loading (should detect gzip by magic number)
 	loaded, err := LoadTraceFile(testFile)

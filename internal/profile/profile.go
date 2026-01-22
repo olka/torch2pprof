@@ -53,15 +53,15 @@ type Profile struct {
 func (p *Profile) Encode() ([]byte, error) {
 	var buf []byte
 
-	for _, st := range p.SampleType {
-		msg := encodeValueType(st)
+	for i := range p.SampleType {
+		msg := encodeValueType(p.SampleType[i])
 		buf = append(buf, encodeTag(1, 2)...)
 		buf = append(buf, encodeVarint(uint64(len(msg)))...)
 		buf = append(buf, msg...)
 	}
 
-	for _, s := range p.Sample {
-		msg := encodeSample(s)
+	for i := range p.Sample {
+		msg := encodeSample(p.Sample[i])
 		buf = append(buf, encodeTag(2, 2)...)
 		buf = append(buf, encodeVarint(uint64(len(msg)))...)
 		buf = append(buf, msg...)
@@ -113,7 +113,7 @@ func (p *Profile) Encode() ([]byte, error) {
 	return buf, nil
 }
 
-func encodeTag(fieldNum int, wireType int) []byte {
+func encodeTag(fieldNum, wireType int) []byte {
 	return encodeVarint(uint64((fieldNum << 3) | wireType))
 }
 

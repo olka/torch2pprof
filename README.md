@@ -125,12 +125,28 @@ torch2pprof analyze [options] <input.json|input.json.gz>
 
 ```
 torch2pprof/
-├── cmd/
-│   └── torch2pprof/        # Main tool with convert & analyze subcommands
-├── internal/
-│   ├── profile/            # pprof protobuf encoding
-│   └── converter/          # Trace loading, conversion, and analysis
-└── test/                   # Test data and utilities
+├── cmd/                          # Command-line applications
+│   └── torch2pprof/              # Main tool with subcommands
+│       └── main.go               # Entry point with convert & analyze commands
+│
+├── internal/                     # Private packages (not for external import)
+│   ├── profile/
+│   │   └── profile.go            # pprof protobuf encoding
+│   └── converter/                # Core conversion and analysis logic
+│       ├── trace.go              # Trace loading, processing, and conversion
+│       └── analyzer.go           # Trace analysis and statistics
+│
+├── test/                         # Test data and utilities
+│   └── pprof_verification.py     # Python script to verify pprof output
+│
+├── data/                         # Sample data
+│   └── trace.json.gz             # Example PyTorch trace
+│
+├── doc/                          # Documentation
+├── go.mod                        # Go module definition
+├── go.sum                        # Dependency checksums
+├── Makefile                      # Build automation
+├── README.md                     # User documentation
 ```
 
 ## Building

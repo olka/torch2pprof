@@ -1,0 +1,35 @@
+# Build artifacts
+bin/
+dist/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go
+vendor/
+*.out
+
+# Coverage
+coverage.out
+coverage.html
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test artifacts
+*.pb.gz
+*.test
+
+# Temporary files
+*.tmp
+*.log
+CHECKLIST.md
+CI_CD_SUMMARY.md
+CLAUDE_NOTES.md
+FINAL_SUMMARY.md

@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-release:
+    name: Build Release Binaries
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.24'
+
+    - name: Get version
+      id: version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/}
+        else
+          VERSION=$(git describe --tags --always --dirty)
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+
+    - name: Build all platforms
+      run: make dist
+      env:
+        VERSION: ${{ steps.version.outputs.VERSION }}
+
+    - name: Create checksums
+      run: |
+        cd dist
+        sha256sum * > checksums.txt
+        cat checksums.txt
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-binaries
+        path: dist/*
+        retention-days: 30
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/*
+        body: |
+          ## torch2pprof ${{ steps.version.outputs.VERSION }}
+
+          PyTorch profiler trace to pprof converter
+
+          ### Installation
+
+          Download the appropriate binary for your platform and add it to your PATH.
+
+          ### Features
+          - Convert PyTorch traces to pprof format
+          - Analyze trace statistics
+          - Support for gzip-compressed traces
+
+          ### Checksums
+
+          See `checksums.txt` for SHA256 checksums of all binaries.
+
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-release:
+    name: Test Release Binaries
+    runs-on: ${{ matrix.os }}
+    needs: build-release
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            binary: torch2pprof-linux-amd64
+          - os: macos-latest
+            binary: torch2pprof-darwin-amd64
+          - os: windows-latest
+            binary: torch2pprof-windows-amd64.exe
+
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: release-binaries
+        path: dist
+
+    - name: Test binary (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        chmod +x dist/${{ matrix.binary }}
+        dist/${{ matrix.binary }} --help
+
+    - name: Test binary (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        dist/${{ matrix.binary }} --help

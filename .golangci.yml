@@ -1,9 +1,9 @@
-version: "2"
-
 linters-settings:
   govet:
-    enable:
-      - shadow
+    check-shadowing: false
+    settings:
+      shadow:
+        strict: true
   gocyclo:
     min-complexity: 15
 

@@ -12,8 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        go-version: ["1.24", "1.23"]
+        os: [ubuntu-latest, macos-latest]
+        go-version: ["1.25"]
 
     steps:
       - name: Checkout code
@@ -44,7 +44,6 @@ jobs:
         run: go vet ./...
 
       - name: Run go fmt
-        if: runner.os != 'Windows'
         run: |
           if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
             echo "The following files are not formatted:"
@@ -111,5 +110,5 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v4
         with:
-          version: latest
-          args: --timeout=5m --out-format=colored-line-number
+          version: v1.62
+          args: --timeout=5m

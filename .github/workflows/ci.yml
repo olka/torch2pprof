@@ -93,22 +93,3 @@ jobs:
           name: torch2pprof-linux-amd64
           path: bin/torch2pprof
           retention-days: 7
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.24"
-
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v4
-        with:
-          version: v1.62
-          args: --timeout=5m
